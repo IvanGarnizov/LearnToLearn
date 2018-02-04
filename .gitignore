@@ -1,0 +1,16 @@
+.vs
+
+packages
+
+LearnToLearn.Entities/bin
+
+LearnToLearn.Entities/obj
+
+LearnToLearn.Data/bin
+
+LearnToLearn.Data/obj
+
+LearnToLearn.Rest/bin
+
+LearnToLearn.Rest/obj
+

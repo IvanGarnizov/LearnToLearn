@@ -212,7 +212,7 @@
                 }
 
                 var enrollments = course.Enrollments;
-                var enrollmentModels = Mapper.Map<IEnumerable<Enrollment>, IEnumerable<EnrollmentViewModel>>(enrollments);
+                var enrollmentModels = Mapper.Map<IEnumerable<EnrollmentViewModel>>(enrollments);
 
 
                 return Ok(enrollmentModels);

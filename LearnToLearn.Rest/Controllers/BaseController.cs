@@ -2,20 +2,19 @@
 {
     using System.Web.Http;
 
-    using Data;
+    using Entities;
 
-    public class BaseController : ApiController
+    using Services;
+
+    public class BaseController<T> : ApiController
     {
-        protected LearnToLearnContext context;
+        protected IService<T> service;
+        protected IService<User> userService;
 
-        public BaseController(LearnToLearnContext context)
+        public BaseController(IService<T> service, IService<User> userService)
         {
-            this.context = context;
-        }
-
-        public BaseController()
-            : this(new LearnToLearnContext())
-        {
+            this.service = service;
+            this.userService = userService;
         }
     }
 }

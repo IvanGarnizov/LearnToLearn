@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnToLearn.Data", "LearnT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnToLearn.Entities", "LearnToLearn.Entities\LearnToLearn.Entities.csproj", "{850A6BCC-D973-4838-B475-4F8C18E7308D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnToLearn.Services", "LearnToLearn.Services\LearnToLearn.Services.csproj", "{75CF0B01-DF5B-4D04-A945-126077373F94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{850A6BCC-D973-4838-B475-4F8C18E7308D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{850A6BCC-D973-4838-B475-4F8C18E7308D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{850A6BCC-D973-4838-B475-4F8C18E7308D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75CF0B01-DF5B-4D04-A945-126077373F94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75CF0B01-DF5B-4D04-A945-126077373F94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75CF0B01-DF5B-4D04-A945-126077373F94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75CF0B01-DF5B-4D04-A945-126077373F94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,12 +12,19 @@
     using Microsoft.AspNet.Identity;
 
     using Models;
+
+    using Services;
     
-    public class CoursesController : BaseController
+    public class CoursesController : BaseController<Course>
     {
+        public CoursesController(IService<Course> service, IService<User> userService)
+            : base(service, userService)
+        {
+        }
+
         public IHttpActionResult Get()
         {
-            var courses = context.Courses
+            var courses = service.Get()
                 .Where(c => c.IsVisible)
                 .OrderByDescending(c => c.CreatedAt);
 
@@ -35,8 +42,7 @@
 
         public IHttpActionResult Get(int id)
         {
-            var course = context.Courses
-                .FirstOrDefault(c => c.Id == id);
+            var course = service.GetById(id);
 
             if (course != null)
             {
@@ -54,8 +60,7 @@
         public IHttpActionResult Post(CourseBindingModel model)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (!user.IsTeacher)
             {
@@ -69,12 +74,11 @@
                 Capacity = model.Capacity,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                Teacher = user
+                TeacherId = userId
             };
 
-            context.Courses.Add(course);
-            context.SaveChanges();
-
+            service.Insert(course);
+            
             var courseModel = Mapper.Map<CourseViewModel>(course);
 
             return CreatedAtRoute("DefaultApi", new { id = course.Id }, courseModel);
@@ -84,16 +88,14 @@
         public IHttpActionResult Put(CourseBindingModel model, int id)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (!user.IsTeacher)
             {
                 return Unauthorized();
             }
 
-            var course = context.Courses
-                .FirstOrDefault(c => c.Id == id);
+            var course = service.GetById(id);
 
             if (course != null)
             {
@@ -106,7 +108,7 @@
                 course.Description = model.Description;
                 course.Capacity = model.Capacity;
                 course.UpdatedAt = DateTime.Now;
-                context.SaveChanges();
+                service.Update(course);
 
                 var courseModel = Mapper.Map<CourseViewModel>(course);
 
@@ -122,16 +124,14 @@
         public IHttpActionResult Delete(int id)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (!user.IsTeacher)
             {
                 return Unauthorized();
             }
 
-            var course = context.Courses
-                .FirstOrDefault(c => c.Id == id);
+            var course = service.GetById(id);
 
             if (course != null)
             {
@@ -140,8 +140,7 @@
                     return Unauthorized();
                 }
 
-                context.Courses.Remove(course);
-                context.SaveChanges();
+                service.Delete(course);
 
                 return Ok();
             }
@@ -156,16 +155,14 @@
         public IHttpActionResult ToggleVisibility(int id)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (!user.IsTeacher)
             {
                 return Unauthorized();
             }
 
-            var course = context.Courses
-                .FirstOrDefault(c => c.Id == id);
+            var course = service.GetById(id);
 
             if (course != null)
             {
@@ -175,7 +172,7 @@
                 }
 
                 course.IsVisible = !course.IsVisible;
-                context.SaveChanges();
+                service.Update(course);
 
                 var courseModel = Mapper.Map<CourseViewModel>(course);
 
@@ -186,23 +183,21 @@
                 return NotFound();
             }
         }
-        
+
         [Route("api/courses/{id:int}/enrollments")]
         [HttpGet]
         [Authorize]
         public IHttpActionResult GetEnrollments(int id)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (!user.IsTeacher)
             {
                 return Unauthorized();
             }
 
-            var course = context.Courses
-                .FirstOrDefault(c => c.Id == id);
+            var course = service.GetById(id);
 
             if (course != null)
             {

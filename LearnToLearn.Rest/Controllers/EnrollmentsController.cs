@@ -13,34 +13,41 @@
 
     using Models;
 
-    public class EnrollmentsController : BaseController
+    using Services;
+
+    public class EnrollmentsController : BaseController<Enrollment>
     {
+        private IService<Course> courseService;
+
+        public EnrollmentsController(IService<Enrollment> service, IService<User> userService, IService<Course> courseService)
+            : base(service, userService)
+        {
+            this.courseService = courseService;
+        }
+
         [HttpPost]
         [Authorize]
         public IHttpActionResult Enroll(int courseId)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (user.IsTeacher)
             {
                 return Unauthorized();
             }
 
-            var course = context.Courses
-                .FirstOrDefault(c => c.Id == courseId);
+            var course = courseService.GetById(courseId);
             var enrollment = new Enrollment()
             {
                 Grade = 0,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                Course = course,
-                User = user
+                CourseId = courseId,
+                UserId = userId
             };
 
-            context.Enrollments.Add(enrollment);
-            context.SaveChanges();
+            service.Insert(enrollment);
 
             var enrollmentModel = Mapper.Map<EnrollmentViewModel>(enrollment);
 
@@ -52,16 +59,14 @@
         public IHttpActionResult Grade(int id, double grade)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (!user.IsTeacher)
             {
                 return Unauthorized();
             }
 
-            var enrollment = context.Enrollments
-                .FirstOrDefault(e => e.Id == id);
+            var enrollment = service.GetById(id);
 
             if (enrollment != null)
             {
@@ -72,7 +77,7 @@
 
                 enrollment.Grade = grade;
                 enrollment.UpdatedAt = DateTime.Now;
-                context.SaveChanges();
+                service.Update(enrollment);
 
                 var enrollmentModel = Mapper.Map<EnrollmentViewModel>(enrollment);
 
@@ -90,8 +95,7 @@
         public IHttpActionResult GradeMany([FromUri]IDictionary<int, double> enrollmentGrades)
         {
             string userId = User.Identity.GetUserId();
-            var user = context.Users
-                .FirstOrDefault(u => u.Id == userId);
+            var user = userService.GetById(userId);
 
             if (!user.IsTeacher)
             {
@@ -102,17 +106,16 @@
 
             foreach (var enrollmentGrade in enrollmentGrades)
             {
-                var enrollment = context.Enrollments
-                    .FirstOrDefault(e => e.Id == enrollmentGrade.Key);
+                var enrollment = service.GetById(enrollmentGrade.Key);
 
                 if (userId == enrollment.Course.TeacherId)
                 {
                     enrollment.Grade = enrollmentGrade.Value;
                     enrollment.UpdatedAt = DateTime.Now;
+                    service.Update(enrollment);
                 }
 
                 enrollments.Add(enrollment);
-                context.SaveChanges();
             }
 
             var enrollmentModels = Mapper.Map<IEnumerable<EnrollmentViewModel>>(enrollments);
@@ -125,8 +128,7 @@
         public IHttpActionResult Delete(int id)
         {
             string userId = User.Identity.GetUserId();
-            var enrollment = context.Enrollments
-                .FirstOrDefault(e => e.Id == id);
+            var enrollment = service.GetById(id);
 
             if (enrollment != null)
             {
@@ -135,8 +137,7 @@
                     return Unauthorized();
                 }
 
-                context.Enrollments.Remove(enrollment);
-                context.SaveChanges();
+                service.Delete(enrollment);
 
                 return Ok();
             }

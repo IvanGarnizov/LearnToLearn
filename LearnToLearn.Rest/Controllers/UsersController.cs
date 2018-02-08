@@ -8,9 +8,8 @@
     
     using Models;
 
-    public class UsersController : BaseController
+    public class UsersController : ApiController
     {
-
         [Route("Login")]
         public async Task<IHttpActionResult> Login(UserBindingModel model)
         {
